@@ -1,9 +1,11 @@
-const mongoose = require("mongoose")
+require('dotenv').config(); // Load environment variables
 
+const mongoose = require("mongoose");
 
-// ✅ Use environment variable instead of hardcoded URI
+// Get Mongo URI from .env file
 const mongoURI = process.env.MONGO_URI;
 
+// Connect to MongoDB
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -15,18 +17,18 @@ mongoose.connect(mongoURI, {
   console.error("Failed to connect to MongoDB", err);
 });
 
-
+// Schema and model
 const logInSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    password: {
-        type: String,
-        required: true
-    }
-})
+  name: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  }
+});
 
-const collection = new mongoose.model("LoginCollection", logInSchema)
+const collection = new mongoose.model("LoginCollection", logInSchema);
 
-module.exports = collection
+module.exports = collection;
