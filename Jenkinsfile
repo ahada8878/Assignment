@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'git 'https://github.com/ahada8878/Assignment.git'
+                git 'https://github.com/ahada8878/Assignment.git'
 '
             }
         }
