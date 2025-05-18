@@ -1,14 +1,20 @@
 const mongoose = require("mongoose")
 
 
-mongoose.connect("mongodb://localhost:27017/Login-Sigup")
+// ✅ Use environment variable instead of hardcoded URI
+const mongoURI = process.env.MONGO_URI;
 
-.then(()=> {
-    console.log("mongodb connected")
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 })
-.catch(()=> {
-    console.log("failed to connect")
+.then(() => {
+  console.log("MongoDB connected");
 })
+.catch((err) => {
+  console.error("Failed to connect to MongoDB", err);
+});
+
 
 const logInSchema = new mongoose.Schema({
     name: {

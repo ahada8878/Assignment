@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  web:
+    image: ahada8878/part1:latest
+    container_name: myapp_container_new
+    ports:
+      - "8081:80"
+    environment:
+      - MONGO_URI=mongodb+srv://abdulahadxrx:lp7rC7jgY07HmxUl@cluster0.qahvjfw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+    volumes:
+      - ./your-code-dir:/app  # 👈 bind mount to inject your source code
