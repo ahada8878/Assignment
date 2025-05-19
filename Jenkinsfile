@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
-        COMPOSE_PROJECT_NAME = 'new_project_name'
+        CONTAINER_NAME = 'myapp_container'
+        IMAGE_NAME = 'myapp_image'
+        APP_PORT = '8081' // both internal and external
     }
 
     stages {
@@ -12,25 +14,38 @@ pipeline {
             }
         }
 
-        stage('Clean Up Docker') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    // Stop any containers that are using port 8081
-                    sh '''
-                    CONTAINERS=$(docker ps -q --filter "publish=8081")
-                    if [ -n "$CONTAINERS" ]; then
-                      docker rm -f $CONTAINERS
-                    fi
-                    '''
+                    // Build the image with latest code
+                    sh "docker build -t ${IMAGE_NAME} ."
                 }
             }
         }
 
-        stage('Build with Docker Compose') {
+        stage('Stop Existing Container') {
             steps {
                 script {
-                    sh "docker-compose -p ${env.COMPOSE_PROJECT_NAME} -f docker-compose.yml down || true"
-                    sh "docker-compose -p ${env.COMPOSE_PROJECT_NAME} -f docker-compose.yml up -d --build"
+                    // Stop and remove old container if it exists
+                    sh """
+                    if [ \$(docker ps -aq -f name=${CONTAINER_NAME}) ]; then
+                        docker rm -f ${CONTAINER_NAME}
+                    fi
+                    """
+                }
+            }
+        }
+
+        stage('Run Updated Container') {
+            steps {
+                script {
+                    // Start new container with same name and port
+                    sh """
+                    docker run -d \
+                        --name ${CONTAINER_NAME} \
+                        -p ${APP_PORT}:${APP_PORT} \
+                        ${IMAGE_NAME}
+                    """
                 }
             }
         }
@@ -38,7 +53,10 @@ pipeline {
 
     post {
         failure {
-            echo 'Build failed. Check Docker containers and ports.'
+            echo '❌ Build failed. Check Docker image or container issues.'
+        }
+        success {
+            echo '✅ App successfully rebuilt and running on port 8081.'
         }
     }
 }
